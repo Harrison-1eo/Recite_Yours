@@ -1,14 +1,18 @@
 package main
 
 import (
+	"backend/models"
 	"backend/routers"
 	"github.com/gin-gonic/gin"
 )
 
-var jwtSecret = []byte("your_secret_key") // 请换成复杂的随机字符串
-
 func main() {
+	models.InitDB()
+
 	r := gin.Default()
 	routers.SetupRoutes(r)
-	r.Run(":8080") // 设置监听端口
+	err := r.Run("0.0.0.0:8002")
+	if err != nil {
+		panic("启动失败" + err.Error())
+	} // 设置监听端口
 }

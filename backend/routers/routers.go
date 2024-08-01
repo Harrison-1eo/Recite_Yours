@@ -11,10 +11,21 @@ func SetupRoutes(r *gin.Engine) {
 	r.POST("/login", services.Login)
 
 	// 需要验证的路由
-	authorized := r.Group("/", services.JWTMiddleware())
+	api := r.Group("/api")
+	api.Use(services.JWTMiddleware())
+
+	sources := api.Group("/sources")
 	{
-		authorized.POST("/words", services.AddWord)
-		authorized.GET("/words/export", services.ExportWords)
-		authorized.GET("/words/stats", services.GetStatistics)
+		sources.POST("/add", services.AddSource)
+		sources.GET("/list", services.GetSources)
 	}
+
+	words := api.Group("/words")
+	{
+		words.POST("/add", services.AddWord)
+		words.GET("/export", services.ExportWords)
+		words.GET("/stats", services.GetStatistics)
+	}
+
+	//
 }

@@ -3,75 +3,97 @@ package services
 import (
 	"backend/models"
 	"backend/utils"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"time"
 )
+
+var JwtSecret = []byte("X2PP7eAXSj")
 
 // Register 新用户注册
 func Register(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusOK, utils.Error(err.Error()))
+		utils.Error(c, "参数错误")
 		return
 	}
 
-	// 进行密码哈希处理
-	// ...
+	// 校验用户名是否已存在
+	if models.IsUsernameExist(user.Username) {
+		utils.Error(c, "用户名已存在")
+		return
+	}
 
 	// 保存用户到数据库
-	// ...
+	if err := models.DB.Create(&user).Error; err != nil {
+		utils.Error(c, "注册失败")
+		return
+	}
 
-	c.JSON(http.StatusOK, utils.Success("注册成功", nil))
+	utils.Success(c, "注册成功", nil)
 }
 
 // Login 用户登录
 func Login(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusOK, utils.Error(err.Error()))
+		utils.Error(c, "参数错误")
 		return
 	}
 
 	// 校验用户信息
-	// ...
+	if err := models.DB.Where("username = ? AND password = ?", user.Username, user.Password).First(&user).Error; err != nil {
+		utils.Error(c, "用户名或密码错误")
+		return
+	}
 
 	// 如果用户信息正确，生成 JWT
 	token, err := generateToken(user.ID)
 	if err != nil {
-		c.JSON(http.StatusOK, utils.Error("生成token失败"))
+		utils.Error(c, "生成 token 失败")
 		return
 	}
 
-	c.JSON(http.StatusOK, utils.Success("登录成功", gin.H{"token": token}))
+	utils.Success(c, "登录成功", gin.H{"token": token})
 }
 
 func generateToken(userID uint) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
-		"exp":     time.Now().Add(24 * time.Hour).Unix(),
+		"exp":     time.Now().Add(2 * time.Hour).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtSecret)
+	return token.SignedString(JwtSecret)
 }
 
-// JWT 验证中间件
+// JWTMiddleware JWT 验证中间件
 func JWTMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("Authorization")
 		if token == "" {
-			c.JSON(http.StatusOK, utils.Error("授权失败"))
+			utils.Error(c, "未登录")
 			c.Abort()
 			return
 		}
 
+		println("token >>> ", token)
+
+		// 检查Bearer token格式
+		if len(token) < 7 || token[:7] != "Bearer " {
+			utils.Error(c, "token 格式错误")
+			c.Abort()
+			return
+		}
+
+		token = token[7:]
+
 		claims := jwt.MapClaims{}
 		_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-			return jwtSecret, nil
+			return JwtSecret, nil
 		})
 
 		if err != nil {
-			c.JSON(http.StatusOK, utils.Error("授权失败"))
+			utils.Error(c, "验证 token 失败")
 			c.Abort()
 			return
 		}
