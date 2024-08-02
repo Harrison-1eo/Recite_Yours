@@ -3,10 +3,10 @@ package models
 import "time"
 
 type User struct {
-	ID        uint      `gorm:"primaryKey;autoIncrement"`
-	Username  string    `gorm:"unique;not null"`
-	Password  string    `gorm:"not null"`
-	CreatedAt time.Time `gorm:"autoCreateTime"`
+	ID        uint      `gorm:"primaryKey;autoIncrement" json:"ID"`
+	Username  string    `gorm:"unique;not null" json:"username"`
+	Password  string    `gorm:"not null" json:"password"`
+	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt"`
 }
 
 func IsUsernameExist(username string) bool {

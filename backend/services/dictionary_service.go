@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"sort"
 )
 
 // Autocomplete 通过前缀查找匹配的单词
@@ -18,7 +19,7 @@ func Autocomplete(c *gin.Context) {
 
 	var words []models.EnChDict
 	// 按照priority降序排列，取前10个
-	if err := models.DB.Where("word LIKE ?", prefix+"%").Order("priority DESC").Limit(20).Find(&words).Error; err != nil {
+	if err := models.DB.Where("word LIKE ?", prefix+"%").Order("priority DESC").Limit(10).Find(&words).Error; err != nil {
 		utils.Error(c, "查询失败")
 		return
 	}
@@ -33,7 +34,7 @@ func Autocomplete(c *gin.Context) {
 	for _, v := range suggestions {
 		s = append(s, v.Word)
 	}
-
+	sort.Strings(s)
 	utils.Success(c, "查询成功", s)
 }
 
@@ -45,8 +46,8 @@ func GetMeaning(c *gin.Context) {
 		return
 	}
 
-	var entry models.EnChDict
-	if err := models.DB.Where("word = ?", word).Order("priority DESC").First(&entry).Error; err != nil {
+	var entries []models.EnChDict
+	if err := models.DB.Where("word = ?", word).Order("priority DESC").Find(&entries).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			utils.Error(c, "未找到该单词")
 		} else {
@@ -55,5 +56,5 @@ func GetMeaning(c *gin.Context) {
 		return
 	}
 
-	utils.Success(c, "查询成功", entry)
+	utils.Success(c, "查询成功", entries)
 }

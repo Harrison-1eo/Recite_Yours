@@ -1,9 +1,9 @@
 package models
 
 type Source struct {
-	ID     uint   `gorm:"primaryKey;autoIncrement"`
-	Name   string `gorm:"unique;not null"`
-	UserID uint   `gorm:"not null"`
+	ID     uint   `gorm:"primaryKey;autoIncrement" json:"ID"`
+	Name   string `gorm:"unique;not null" json:"name"`
+	UserID uint   `gorm:"not null" json:"userID"`
 }
 
 func IsSourceExist(name string, userID uint) bool {

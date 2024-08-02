@@ -71,14 +71,14 @@ func JWTMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("Authorization")
 		if token == "" {
-			utils.Error(c, "未登录")
+			utils.NLI(c, "未登录状态")
 			c.Abort()
 			return
 		}
 
 		// 检查Bearer token格式
 		if len(token) < 7 || token[:7] != "Bearer " {
-			utils.Error(c, "token 格式错误")
+			utils.NLI(c, "token 格式错误")
 			c.Abort()
 			return
 		}
@@ -91,7 +91,7 @@ func JWTMiddleware() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			utils.Error(c, "验证 token 失败")
+			utils.NLI(c, "验证 token 失败")
 			c.Abort()
 			return
 		}

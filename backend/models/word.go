@@ -3,14 +3,14 @@ package models
 import "time"
 
 type Word struct {
-	ID              uint `gorm:"primaryKey;autoIncrement"`
-	UserID          uint
-	Word            string
-	Translation     string
-	ExampleSentence string
-	Note            string
-	Tag             string
-	SourceID        uint      `gorm:"not null"`
-	Date            time.Time `gorm:"not null"`
-	CreatedAt       time.Time `gorm:"autoCreateTime"`
+	ID              uint      `gorm:"primaryKey;autoIncrement" json:"ID"`
+	UserID          uint      `gorm:"not null" json:"userID"`
+	Word            string    `gorm:"not null" json:"word"`
+	Translation     string    `json:"translation"`
+	ExampleSentence string    `json:"exampleSentence"`
+	Note            string    `json:"note"`
+	Tag             string    `json:"tag"`
+	SourceID        uint      `gorm:"not null" json:"sourceID"`
+	Date            time.Time `gorm:"not null" json:"date"`
+	CreatedAt       time.Time `gorm:"autoCreateTime" json:"createdAt"`
 }

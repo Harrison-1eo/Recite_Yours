@@ -23,3 +23,11 @@ func Error(c *gin.Context, message string) {
 		Data:    nil,
 	})
 }
+
+func NLI(c *gin.Context, message string) {
+	c.JSON(200, Response{
+		Code:    2,
+		Message: message,
+		Data:    nil,
+	})
+}
