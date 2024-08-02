@@ -22,6 +22,8 @@ func SetupRoutes(r *gin.Engine) {
 
 	words := api.Group("/words")
 	{
+		words.GET("/autocomplete", services.Autocomplete)
+		words.GET("/meaning", services.GetMeaning)
 		words.POST("/add", services.AddWord)
 		words.GET("/export", services.ExportWords)
 		words.GET("/stats", services.GetStatistics)

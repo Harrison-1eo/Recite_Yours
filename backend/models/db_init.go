@@ -22,6 +22,7 @@ func InitDB() {
 		&User{},
 		&Source{},
 		&Word{},
+		&EnChDict{},
 	)
 	if err != nil {
 		panic("failed to migrate database" + err.Error())

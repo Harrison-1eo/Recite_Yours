@@ -25,7 +25,7 @@ func AddWord(c *gin.Context) {
 		return
 	}
 
-	utils.Success(c, "添加成功", nil)
+	utils.Success(c, "添加成功", word)
 }
 
 // ExportWords 导出生词

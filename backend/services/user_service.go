@@ -76,8 +76,6 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		println("token >>> ", token)
-
 		// 检查Bearer token格式
 		if len(token) < 7 || token[:7] != "Bearer " {
 			utils.Error(c, "token 格式错误")
