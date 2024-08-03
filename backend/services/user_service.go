@@ -3,8 +3,8 @@ package services
 import (
 	"backend/models"
 	"backend/utils"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
 
@@ -69,34 +69,57 @@ func generateToken(userID uint) (string, error) {
 // JWTMiddleware JWT 验证中间件
 func JWTMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token := c.Request.Header.Get("Authorization")
-		if token == "" {
+		jwtStr := c.Request.Header.Get("Authorization")
+		if jwtStr == "" {
 			utils.NLI(c, "未登录状态")
 			c.Abort()
 			return
 		}
 
 		// 检查Bearer token格式
-		if len(token) < 7 || token[:7] != "Bearer " {
+		if len(jwtStr) < 7 || jwtStr[:7] != "Bearer " {
 			utils.NLI(c, "token 格式错误")
 			c.Abort()
 			return
 		}
 
-		token = token[7:]
+		jwtStr = jwtStr[7:]
 
-		claims := jwt.MapClaims{}
-		_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.Parse(jwtStr, func(token *jwt.Token) (interface{}, error) {
 			return JwtSecret, nil
 		})
-
+		if !token.Valid {
+			utils.NLI(c, "token 失效")
+			c.Abort()
+			return
+		}
 		if err != nil {
 			utils.NLI(c, "验证 token 失败")
 			c.Abort()
 			return
 		}
 
-		c.Set("user_id", claims["user_id"])
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			utils.NLI(c, "token 格式错误")
+			c.Abort()
+			return
+		}
+
+		//fmt.Println("JWTMiddleware claims: ", claims)
+		//for key, _ := range claims {
+		//	fmt.Println("key: ", key)
+		//	fmt.Println("value: ", claims[key])
+		//}
+
+		userID, ok := claims["user_id"].(float64)
+		if !ok {
+			utils.NLI(c, "token 格式错误")
+			c.Abort()
+			return
+		}
+
+		c.Set("user_id", uint(userID))
 		c.Next()
 	}
 }

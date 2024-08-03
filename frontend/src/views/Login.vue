@@ -50,13 +50,13 @@ export default {
                             username: this.username,
                             password: this.password
                         })
+                if (!res) return;
                 localStorage.setItem('username', this.username)
                 localStorage.setItem('token', res.token)
                 this.$router.push('/user')
                 showSuccessToast('登录成功')
             } catch (error) {
                 console.error('Login failed:', error)
-                showErrorToast("登录失败")
             }
         }
     }

@@ -24,6 +24,7 @@ func Error(c *gin.Context, message string) {
 	})
 }
 
+// NLI (No Login Information) 未登录信息
 func NLI(c *gin.Context, message string) {
 	c.JSON(200, Response{
 		Code:    2,
