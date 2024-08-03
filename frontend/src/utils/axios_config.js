@@ -1,12 +1,11 @@
 import axios from 'axios';
-import { Toast } from 'bootstrap';
 import {showErrorToast} from "@/utils/showMessage";
 import router from "@/router/router"; // 如果你使用 Bootstrap 的 Toast 组件来显示消息
 
 // 创建一个 Axios 实例
 const axios_instance = axios.create({
-    // baseURL: 'http://47.92.84.147:8010', // 替换为你的后端接口基础 URL
-    baseURL: 'http://localhost:8010', // 替换为你的后端接口基础 URL
+    baseURL: 'http://47.92.84.147:8010', // 替换为你的后端接口基础 URL
+    // baseURL: 'http://localhost:8010', // 替换为你的后端接口基础 URL
     timeout: 10000, // 请求超时时间（毫秒）
     headers: { 'Content-Type': 'application/json' }
 });

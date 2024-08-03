@@ -14,6 +14,10 @@
                             <label for="password" class="form-label">密码</label>
                             <input type="password" class="form-control" id="password" v-model="password" required />
                         </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe" v-model="rememberMe"/>
+                            <label class="form-check-label" for="rememberMe">记住我</label>
+                        </div>
                         <button type="submit" class="btn btn-primary w-100">登录</button>
                     </form>
                     <div class="text-center mt-3">
@@ -28,8 +32,8 @@
 <script>
 import Navbar from '../components/Navbar.vue'
 import axios_instance from '../utils/axios_config'
-import {API} from "../utils/axios_config";
-import {showErrorToast, showSuccessToast} from "@/utils/showMessage";
+import {API} from "@/utils/axios_config";
+import {showSuccessToast} from "@/utils/showMessage";
 
 export default {
     name: 'Login',
@@ -40,6 +44,14 @@ export default {
         return {
             username: '',
             password: '',
+            rememberMe: false
+        }
+    },
+    created() {
+        if (localStorage.getItem('rememberMe')) {
+            this.username = localStorage.getItem('username')
+            this.password = localStorage.getItem('password')
+            this.rememberMe = true
         }
     },
     methods: {
@@ -51,6 +63,11 @@ export default {
                             password: this.password
                         })
                 if (!res) return;
+                if (this.rememberMe) {
+                    localStorage.setItem('rememberMe', this.rememberMe)
+                    localStorage.setItem('username', this.username)
+                    localStorage.setItem('password', this.password)
+                }
                 localStorage.setItem('username', this.username)
                 localStorage.setItem('token', res.token)
                 this.$router.push('/user')
